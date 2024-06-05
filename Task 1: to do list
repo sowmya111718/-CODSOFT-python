@@ -1,0 +1,89 @@
+import datetime
+
+class Task:
+    def __init__(self, description, priority=1, due_date=None):
+        self.description = description
+        self.priority = priority
+        self.due_date = due_date
+        self.completed = False
+
+    def mark_completed(self):
+        self.completed = True
+
+class ToDoList:
+    def __init__(self):
+        self.lists = {"Default": [], "Work": [], "Personal": []}
+        self.current_list = "Default"
+
+    def add_task(self, task, list_name=None):
+        if list_name and list_name in self.lists:
+            self.lists[list_name].append(task)
+        else:
+            self.lists[self.current_list].append(task)
+
+    def change_list(self, list_name):
+        if list_name in self.lists:
+            self.current_list = list_name
+
+    def display_tasks(self, list_name=None):
+        if list_name and list_name in self.lists:
+            tasks = self.lists[list_name]
+        else:
+            tasks = self.lists[self.current_list]
+
+        for index, task in enumerate(tasks, start=1):
+            status = "Completed" if task.completed else "Not Completed"
+            due_date_str = task.due_date.strftime("%Y-%m-%d") if task.due_date else "None"
+            priority_level = "High" if task.priority == 1 else "Medium" if task.priority == 2 else "Low"
+            print(f"{index}. {task.description} - Priority: {priority_level} - Status: {status} - Due Date: {due_date_str}")
+
+def main():
+    todo_list = ToDoList()
+
+    while True:
+        print("\nTo-Do List Application")
+        print("1. Add Task")
+        print("2. Mark Task as Completed")
+        print("3. Change Task List")
+        print("4. Display Tasks")
+        print("5. Exit")
+
+        choice = input("Enter your choice: ")
+
+        if choice == "1":
+            description = input("Enter task description: ")
+            priority = int(input("Enter priority (1-High, 2-Medium, 3-Low): "))
+            due_date_str = input("Enter due date (YYYY-MM-DD) or leave empty: ")
+            due_date = datetime.datetime.strptime(due_date_str, "%Y-%m-%d").date() if due_date_str else None
+            task = Task(description, priority, due_date)
+            list_name = input("Enter list name (Default, Work, Personal) or leave empty: ")
+            todo_list.add_task(task, list_name)
+            print("Task added successfully!")
+
+        elif choice == "2":
+            task_list = todo_list.lists[todo_list.current_list]
+            try:
+                task_index = int(input("Enter the task number to mark as completed: ")) - 1
+                task_list[task_index].mark_completed()
+                print("Task marked as completed!")
+            except IndexError:
+                print("Invalid task number.")
+
+        elif choice == "3":
+            list_name = input("Enter the list name (Default, Work, Personal): ")
+            todo_list.change_list(list_name)
+            print(f"Switched to {list_name} list.")
+
+        elif choice == "4":
+            list_name = input("Enter the list name (Default, Work, Personal) or leave empty: ")
+            todo_list.display_tasks(list_name)
+
+        elif choice == "5":
+            print("Exiting the To-Do List application.")
+            break
+
+        else:
+            print("Invalid choice. Please select a valid option.")
+
+if __name__ == "__main__":
+    main()
